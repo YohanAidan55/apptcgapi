@@ -1,6 +1,7 @@
 package com.aidan.apptcg.security.oauth2;
 
 
+import com.aidan.apptcg.user.domain.enums.RoleEnum;
 import com.aidan.apptcg.user.repository.entity.UserEntity;
 import com.aidan.apptcg.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         String email = (String) attributes.get("email");
-        String userName = (String) attributes.get("userName");
+        String userName = (String) attributes.get("name");
+        String firstName = (String) attributes.get("given_name");
+        String lastName = (String) attributes.get("family_name");
 
         // Vérifie si l’utilisateur existe déjà
         Optional<UserEntity> existingUser = userRepository.findByEmail(email);
@@ -36,6 +39,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             UserEntity newUserEntity = new UserEntity();
             newUserEntity.setEmail(email);
             newUserEntity.setUserName(userName);
+            newUserEntity.setFirstName(firstName);
+            newUserEntity.setLastName(lastName);
+            newUserEntity.setEnabled(true);
+            newUserEntity.setRole(RoleEnum.ROLE_USER);
             return userRepository.save(newUserEntity);
         });
 

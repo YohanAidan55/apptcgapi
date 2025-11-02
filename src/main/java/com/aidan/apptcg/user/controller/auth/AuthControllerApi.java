@@ -21,6 +21,9 @@ public interface AuthControllerApi {
     @PostMapping("/login")
     RegisterResponseDTO login(@RequestBody @Validated LoginRequest request);
 
+    @PostMapping("/api/auth/set-password")
+    void setPassword(@RequestBody SetPasswordRequest request);
+
     @PostMapping("/confirm")
     UserDTO confirmAccount(@RequestBody @Validated ConfirmRegisterRequest confirmRegisterRequest);
 
@@ -34,5 +37,6 @@ public interface AuthControllerApi {
     record ForgotPasswordRequest(@NotNull @Email String email) {}
     record ConfirmRegisterRequest(@NotNull String token) {}
     record ResetPasswordRequest(@NotNull String token, @NotNull @Length(min = 6, max = 50) String newPassword) {}
+    record SetPasswordRequest(@NotNull @Email String email, @NotNull @Length(min = 6, max = 50) String newPassword) {}
 
 }

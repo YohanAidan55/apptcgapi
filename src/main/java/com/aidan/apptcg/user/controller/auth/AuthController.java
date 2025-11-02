@@ -36,6 +36,11 @@ public class AuthController implements AuthControllerApi {
         return new RegisterResponseDTO(token);
     }
 
+    @Override
+    public void setPassword(SetPasswordRequest request) {
+        authService.setPassword(request.email(), request.newPassword());
+    }
+
     public UserDTO confirmAccount(ConfirmRegisterRequest confirmRegisterRequest) {
          return authService.confirmToken(confirmRegisterRequest.token());
     }

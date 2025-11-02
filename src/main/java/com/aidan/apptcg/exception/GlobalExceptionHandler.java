@@ -32,4 +32,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleNotFoundException(NotFoundException ex) {
         return ex.getProblemDetail();
     }
+
+    @ExceptionHandler(ApiException.class)
+    public ProblemDetail handleApiException(ApiException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("Erreur API");
+        problemDetail.setProperty("code", ex.getCode());
+        return problemDetail;
+    }
 }

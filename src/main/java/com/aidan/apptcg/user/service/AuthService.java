@@ -1,5 +1,6 @@
 package com.aidan.apptcg.user.service;
 
+import com.aidan.apptcg.exception.ApiException;
 import com.aidan.apptcg.exception.NotFoundException;
 import com.aidan.apptcg.notification.controller.NotificationControllerApi;
 import com.aidan.apptcg.security.jwt.JwtService;
@@ -9,7 +10,10 @@ import com.aidan.apptcg.user.repository.UserRepository;
 import com.aidan.apptcg.user.repository.entity.UserEntity;
 import com.aidan.apptcg.user.repository.mapper.UserMapper;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +31,15 @@ public class AuthService {
     @Transactional
     public UserDTO register(UserDTO userDTO) {
         userRepository.findByEmail(userDTO.getEmail())
-                .ifPresent(_ -> {
-                    throw new IllegalStateException("User already exists with email: " + userDTO.getEmail());
+                .ifPresent(userEntity -> {
+                    if (userEntity.getPassword() == null) { // compte OAuth2
+                        throw new ApiException("EMAIL_ALREADY_OAUTH2",
+                                "Vous avez déjà un compte via Google. Connectez-vous via Google.");
+                    } else { // compte classique
+                        throw new ApiException("EMAIL_ALREADY_EXIST",
+                                "Un utilisateur existe déjà avec cet e-mail."
+                        );
+                    }
                 });
         UserEntity userEntity = userMapper.toEntity(userDTO);
         userEntity.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -76,6 +87,14 @@ public class AuthService {
                 .orElseThrow(() -> new NotFoundException(UserEntity.class, email));
 
         user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    public void setPassword(String email, String password) {
+        var userOpt = userRepository.findByEmail(email);
+        var user = userOpt.orElseThrow(() -> new ApiException("USER_NOT_FOUND", "Utilisateur non trouvé"));
+
+        user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
 }

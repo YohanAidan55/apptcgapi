@@ -43,7 +43,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("OAuth2 login success for user: {}", email);
 
         // 🔁 Redirige vers ton front (Angular/Ionic/React) avec le token dans l’URL
-        String redirectUrl = FRONT_REDIRECT_URL + URLEncoder.encode(token, StandardCharsets.UTF_8);
+        String redirectUrl = frontendRedirectBase + URLEncoder.encode(token, StandardCharsets.UTF_8);
         response.sendRedirect(redirectUrl);
     }
 }
