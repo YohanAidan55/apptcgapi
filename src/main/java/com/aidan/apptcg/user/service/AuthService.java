@@ -48,7 +48,7 @@ public class AuthService {
         }
 
         UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(UserEntity.class, email));
+                .orElseThrow(() -> new IllegalStateException("User not found with email: " + email));
         userEntity.setEnabled(true);
         return userMapper.toDto(userRepository.save(userEntity));
     }

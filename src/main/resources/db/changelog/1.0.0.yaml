@@ -12,7 +12,7 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_users
                   name: id
-                  type: CHAR(36)
+                  type: UUID
               - column:
                   name: first_name
                   type: VARCHAR(255)

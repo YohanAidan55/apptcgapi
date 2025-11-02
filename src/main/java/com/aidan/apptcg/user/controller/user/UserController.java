@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,20 +22,15 @@ public class UserController implements UserControllerApi {
     private final UserMapper userMapper;
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(UserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        }
-
-        Optional<UserEntity> userOpt = userRepository.findByEmail(userDetails.getUsername());
-        return userOpt
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(404).body((UserEntity) Map.of("error", "User not found")));
+    public UserDTO getCurrentUser(UserDetails userDetails) {
+       return userRepository.findByEmail(userDetails.getUsername())
+               .map(userMapper::toDto)
+                .orElseThrow(() -> new IllegalStateException("User not found with email: " + userDetails.getUsername()));
     }
 
     @GetMapping("/all")
-    public List<UserEntity> getAll() {
-        return userRepository.findAll();
+    public List<UserDTO> getAll() {
+        return userMapper.toDto(userRepository.findAll());
     }
 
     @GetMapping("/getByEmail")

@@ -32,11 +32,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 🔒 Désactivation CSRF pour les API REST stateless
                 .csrf(AbstractHttpConfigurer::disable)
-                // 🌐 CORS global (configuré plus bas)
                 .cors(Customizer.withDefaults())
-                // 🔐 Règles d’accès
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
@@ -47,11 +44,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // 🔑 Login OAuth2 (connexion via Google)
-               // .oauth2Login(oauth2 -> oauth2
-                 //       .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                   //     .successHandler(oAuth2SuccessHandler)
-               // )
-                // 🚫 Pas de session (JWT = stateless)
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 🧩 Ajout du filtre JWT avant l’authentification standard
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
