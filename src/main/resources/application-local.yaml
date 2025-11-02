@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:DB_APPTCG
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+server:
+  port: 8080
+jwt:
+  secret: ${JWT_SECRET:YOUR_VERY_LONG_SECRET_HERE}
+  expiration-ms: 604800000 # 7 days en ms
+app:
+  oauth2:
+    redirect-url: http://localhost:8100/oauth2/callback
+

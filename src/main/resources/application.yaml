@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: "@env@"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: MySyna.pro@gmail.com
+    password: usun wzpk ipjt sosb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
