@@ -16,7 +16,7 @@ public class NotificationService {
         mailMessage.setSubject("Complete Registration to App TCG!");
         mailMessage.setFrom("MySyna.pro@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
-                +"http://localhost:4200/confirm?confirmationToken="+ confirmedToken);
+                +"http://localhost:5173/confirm?confirmationToken="+ confirmedToken);
         mailSender.send(mailMessage);
     }
 
@@ -26,7 +26,7 @@ public class NotificationService {
         mailMessage.setSubject("Reset your password App TCG!");
         mailMessage.setFrom("MySyna.pro@gmail.com");
         mailMessage.setText("To reset your password, please click here : "
-                +"http://localhost:4200/changePassword?confirmationToken="+ confirmedToken);
+                +"http://localhost:5173/changePassword?confirmationToken="+ confirmedToken);
         mailSender.send(mailMessage);
     }
 }

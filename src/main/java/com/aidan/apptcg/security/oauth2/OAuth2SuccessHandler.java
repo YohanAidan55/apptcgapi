@@ -26,7 +26,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
 
     // URL de redirection front-end (tu peux la rendre configurable dans application.yaml)
-    private static final String FRONT_REDIRECT_URL = "http://localhost:4200/oauth2/callback?token=";
+    private static final String FRONT_REDIRECT_URL = "http://localhost:5173/oauth2/callback?token=";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
