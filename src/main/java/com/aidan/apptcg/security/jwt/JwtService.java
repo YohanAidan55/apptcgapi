@@ -19,21 +19,18 @@ public class JwtService {
     private String jwtSecret;
 
     private static final String SECRET_KEY = "your-very-long-secret-key-of-at-least-32-bytes-length-1234567890";
-
+    private static final String TOKEN_TYPE_CLAIM = "token_type";
+    private static final String ACCESS_TYPE = "ACCESS";
+    private static final String EMAIL_TYPE = "EMAIL";
 
     @Value("${jwt.expiration-ms:604800000}") // 7 days par défaut
     private long jwtExpirationMs;
-
-    /*private Key getSigningKey() {
-        // Utilise la clé brute comme bytes. Assure-toi que jwtSecret est suffisamment long.
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-    }*/
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username) {
+    public String generateAccessToken(String username) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + jwtExpirationMs);
 
@@ -41,6 +38,7 @@ public class JwtService {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
+                .claim(TOKEN_TYPE_CLAIM, ACCESS_TYPE)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -53,22 +51,39 @@ public class JwtService {
                 .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
+                .claim(TOKEN_TYPE_CLAIM, EMAIL_TYPE)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, String username) {
+    public boolean isAccessTokenValid(String token, String username) {
         try {
             String tokenUsername = extractUsername(token);
-            return (tokenUsername != null && tokenUsername.equals(username) && !isTokenExpired(token));
+            String type = extractTokenType(token);
+            return (tokenUsername != null && tokenUsername.equals(username) && ACCESS_TYPE.equals(type) && !isTokenExpired(token));
         } catch (JwtException | IllegalArgumentException ex) {
-            log.debug("Invalid JWT token: {}", ex.getMessage());
+            log.debug("Invalid JWT access token: {}", ex.getMessage());
+            return false;
+        }
+    }
+
+    public boolean isEmailTokenValid(String token, String email) {
+        try {
+            String tokenEmail = extractUsername(token);
+            String type = extractTokenType(token);
+            return (tokenEmail != null && tokenEmail.equals(email) && EMAIL_TYPE.equals(type) && !isTokenExpired(token));
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.debug("Invalid JWT email token: {}", ex.getMessage());
             return false;
         }
     }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    private String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get(TOKEN_TYPE_CLAIM, String.class));
     }
 
     public Date extractExpiration(String token) {

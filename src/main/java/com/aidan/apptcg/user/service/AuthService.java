@@ -10,10 +10,7 @@ import com.aidan.apptcg.user.repository.UserRepository;
 import com.aidan.apptcg.user.repository.entity.UserEntity;
 import com.aidan.apptcg.user.repository.mapper.UserMapper;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +51,7 @@ public class AuthService {
     public UserDTO confirmToken(String token) {
         String email = jwtService.extractUsername(token);
 
-        if (email == null || jwtService.isTokenExpired(token)) {
+        if (email == null || !jwtService.isEmailTokenValid(token, email)) {
             throw new IllegalArgumentException("Token invalide ou expiré");
         }
 
@@ -70,7 +67,7 @@ public class AuthService {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(UserEntity.class, email));
 
-        String resetToken = jwtService.generateToken(email);
+        String resetToken = jwtService.generateTokenEmail(email, 5);
 
         notificationControllerApi.sendPasswordResetEmail(user.getEmail(), resetToken);
     }
@@ -79,7 +76,7 @@ public class AuthService {
     public void resetPassword(String token, String newPassword) {
         String email = jwtService.extractUsername(token);
 
-        if (!jwtService.isTokenValid(token, email)) {
+        if (!jwtService.isEmailTokenValid(token, email)) {
             throw new RuntimeException("Token invalide ou expiré");
         }
 

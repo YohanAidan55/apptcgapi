@@ -3,7 +3,6 @@ package com.aidan.apptcg.user.controller.auth;
 import com.aidan.apptcg.security.jwt.JwtService;
 import com.aidan.apptcg.user.domain.dto.RegisterResponseDTO;
 import com.aidan.apptcg.user.domain.dto.UserDTO;
-import com.aidan.apptcg.user.repository.entity.UserEntity;
 import com.aidan.apptcg.user.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +30,7 @@ public class AuthController implements AuthControllerApi {
         );
 
         UserDetails user = (UserDetails) auth.getPrincipal();
-        String token = jwtService.generateToken(user.getUsername());
+        String token = jwtService.generateAccessToken(user.getUsername());
 
         return new RegisterResponseDTO(token);
     }
