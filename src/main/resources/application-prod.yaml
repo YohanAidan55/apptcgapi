@@ -35,5 +35,5 @@ jwt:
   expiration-ms: 604800000 # 7 days en ms
 app:
   oauth2:
-    redirect-url: http://localhost:8080/oauth2/callback?token=
+    redirect-url: http://localhost:5173/oauth2/callback?token=
 
